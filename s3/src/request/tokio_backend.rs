@@ -41,7 +41,9 @@ pub fn client(
     http_connector.enforce_http(false);
     let https_connector = HttpsConnector::from((http_connector, tls_connector));
 
-    Ok(Client::builder().build::<_, hyper::Body>(https_connector))
+    Ok(Client::builder()
+        .pool_idle_timeout(Some(std::time::Duration::from_secs(5)))
+        .build::<_, hyper::Body>(https_connector))
 }
 
 #[cfg(all(
@@ -56,7 +58,9 @@ pub fn client(
     http_connector.set_connect_timeout(request_timeout);
     http_connector.enforce_http(false);
 
-    Ok(Client::builder().build::<_, hyper::Body>(http_connector))
+    Ok(Client::builder()
+        .pool_idle_timeout(Some(std::time::Duration::from_secs(5)))
+        .build::<_, hyper::Body>(http_connector))
 }
 
 #[cfg(all(feature = "tokio-rustls-tls", feature = "no-verify-ssl"))]
@@ -105,7 +109,9 @@ pub fn client(
     http_connector.enforce_http(false);
     let https_connector = HttpsConnector::from((http_connector, config));
 
-    Ok(Client::builder().build::<_, hyper::Body>(https_connector))
+    Ok(Client::builder()
+        .pool_idle_timeout(Some(std::time::Duration::from_secs(5)))
+        .build::<_, hyper::Body>(https_connector))
 }
 
 // Temporary structure for making a request
