@@ -56,6 +56,10 @@ pub(crate) fn client(options: &ClientOptions) -> Result<reqwest::Client, S3Error
         }
     }
 
+    let client = client
+        .tcp_keepalive(std::time::Duration::from_secs(1))
+        .pool_idle_timeout(std::time::Duration::from_secs(15));
+
     Ok(client.build()?)
 }
 // Temporary structure for making a request
