@@ -13,7 +13,6 @@ use crate::bucket::Bucket;
 use crate::command::Command;
 use crate::command::HttpMethod;
 use crate::error::S3Error;
-use crate::retry;
 use crate::utils::now_utc;
 
 use tokio_stream::StreamExt;
@@ -122,7 +121,7 @@ impl<'a> Request for ReqwestRequest<'a> {
     }
 
     async fn response_data(&self, etag: bool) -> Result<ResponseData, S3Error> {
-        let response = retry! {self.response().await }?;
+        let response = self.response().await?;
         let status_code = response.status().as_u16();
         let mut headers = response.headers().clone();
         let response_headers = headers
@@ -154,7 +153,7 @@ impl<'a> Request for ReqwestRequest<'a> {
         writer: &mut T,
     ) -> Result<u16, S3Error> {
         use tokio::io::AsyncWriteExt;
-        let response = retry! {self.response().await}?;
+        let response = self.response().await?;
 
         let status_code = response.status();
         let mut stream = response.bytes_stream();
@@ -167,7 +166,7 @@ impl<'a> Request for ReqwestRequest<'a> {
     }
 
     async fn response_data_to_stream(&self) -> Result<ResponseDataStream, S3Error> {
-        let response = retry! {self.response().await}?;
+        let response = self.response().await?;
         let status_code = response.status();
         let stream = response.bytes_stream().map_err(S3Error::Reqwest);
 
@@ -178,7 +177,7 @@ impl<'a> Request for ReqwestRequest<'a> {
     }
 
     async fn response_header(&self) -> Result<(Self::HeaderMap, u16), S3Error> {
-        let response = retry! {self.response().await}?;
+        let response = self.response().await?;
         let status_code = response.status().as_u16();
         let headers = response.headers().clone();
         Ok((headers, status_code))
