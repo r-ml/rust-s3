@@ -56,8 +56,10 @@ pub(crate) fn client(options: &ClientOptions) -> Result<reqwest::Client, S3Error
     }
 
     let client = client
-        .tcp_keepalive(std::time::Duration::from_secs(1))
-        .pool_idle_timeout(std::time::Duration::from_secs(15));
+        .http2_keep_alive_interval(std::time::Duration::from_secs(1))
+        .http2_keep_alive_timeout(std::time::Duration::from_secs(15))
+        .http2_keep_alive_while_idle(true)
+        .pool_idle_timeout(std::time::Duration::from_secs(20));
 
     Ok(client.build()?)
 }
